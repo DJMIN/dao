@@ -13,7 +13,6 @@ logger_info = logging.info
 logger_warn = logging.warning
 logger_error = logging.error
 
-
 TMP_PATH_CACHE = 'tmp_cache'
 
 
@@ -119,9 +118,9 @@ class Dao(object):
             self,
             shi_func=list,
             shu_func=None,
-            fa_func: typing.Union[list, iter, typing.Callable, None] = list,  *args: typing.Any, **kwargs: typing.Any):
+            fa_func: typing.Union[list, iter, typing.Callable, None] = list, *args: typing.Any, **kwargs: typing.Any):
         # 万物之道
-        return self.__class__(shi_func, shu_func, fa_func, self.zhi().wan_wu)
+        return self.__class__(shi_func, shu_func, fa_func, self.zhi(*args, **kwargs).wan_wu)
 
     def __call__(self, *args: typing.Any, **kwargs: typing.Any) -> typing.Any:
         return self.zhi(*args, **kwargs).wan_wu
@@ -149,7 +148,10 @@ class Dao(object):
         start_time = time.time()
         logger_info('[开始] 生产 [{}()] {}'.format(
             self.shi_func.__name__, ('新参数', args, kwargs, '固定参数', self.args, self.kwargs)))
-        self.san = self.shi_func(*self.args, *args, **self.kwargs, **kwargs)
+        if args or kwargs:
+            self.args, self.kwargs = args, kwargs
+        self.san = self.shi_func(*self.args, **self.kwargs)
+
         if self.fa_func is list:
             self.wan_wu = self.for_do_list(self.qi_func, self.san)
         elif self.fa_func is iter:
