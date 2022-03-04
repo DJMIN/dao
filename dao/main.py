@@ -8,12 +8,16 @@ import wrapt
 import tqdm
 import requests
 
-logger_debug = logging.debug
-logger_info = logging.info
-logger_warn = logging.warning
-logger_error = logging.error
+logger = logging.getLogger('dao')
+logger.setLevel(logging.WARNING)
+
+logger_debug = logger.debug
+logger_info = logger.info
+logger_warn = logger.warning
+logger_error = logger.error
 
 TMP_PATH_CACHE = 'tmp_cache'
+
 
 
 def save_cache_to_file(if_read_cache_key=None):
@@ -85,6 +89,9 @@ class Dao(object):
     势：是从“道、法、术、器”体现的势能，比如“军魂、班风”之类的气场、气势、执行力。这个在“图1”里表现的是一个圈，其实画出来更应该像是太阳的光芒一样，感觉的到，摸 不到。以某个人为例，状态可以达到“善、诚、美、大、圣、神”的六重境界，善为别人以为你拥有美德，诚为你确实有美德，充盈为美，溢出为大，影响数个时代，众人为圣。影响千秋万代不同民族为神，比如佛教、基督教、伊斯兰教的创始人。
     志：主要是指目标，只有通过势能才能达到，势就是火箭助推器形成的力量。
     """
+
+    # show_process = tqdm.tqdm
+    show_process = iter
 
     def __init__(
             self, shi_func=None,
@@ -172,7 +179,7 @@ class Dao(object):
         filter_res_num = 0
 
         logger_info('[开始] 消费 [{}()] {}'.format(func.__name__, its.__class__))
-        for index, it in tqdm.tqdm(enumerate(its)):
+        for index, it in enumerate(cls.show_process(its)):
             res = func(it)
             time_use = time.time() - start_time
             if index < log_size or (not index % log_re):
@@ -196,7 +203,7 @@ class Dao(object):
         all_num = 0
         filter_res_num = 0
         logger_info('[开始] 消费 [{}()] {}'.format(func.__name__, its.__class__))
-        for index, it in tqdm.tqdm(enumerate(its)):
+        for index, it in enumerate(cls.show_process(its)):
             res = func(it)
             time_use = time.time() - start_time
             if index < log_size or (not index % log_re):
@@ -215,12 +222,16 @@ class Dao(object):
         return results
 
 
-if __name__ == '__main__':
+def active_log():
     logging.basicConfig(
         level=logging.INFO,
         format="[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S"
     )
+    logger.setLevel(logging.INFO)
+
+
+if __name__ == '__main__':
     tmp_logger_debug = functools.partial(print, '[DEBUG]')
     logger_debug = lambda x: tmp_logger_debug(repr(x))
     Dao(range, print)(1, 10)
