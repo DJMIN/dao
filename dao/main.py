@@ -69,7 +69,8 @@ def pass_ex(if_ex_return=None, exs=None):
 class Dao(object):
     """
     道、法、术、器、势、志
-    道生一(志),一生二(势、法),二生三（术）,三生万物
+    道生一(志),一生二(法、术),二生三（器）,三生（势）万物
+    # 道生一(志),一生二(势、法),二生三（术）,三生万物???
 
     志：产生类要达到的目的
     势： 函数生产者
@@ -111,9 +112,19 @@ class Dao(object):
         if shu_func:
             self.shu_func = shu_func
         self.fa_func = fa_func  # for循环 map
+        self.wd = self.wu_dao
+        self.WD = self.wu_dao
+
+    def wu_dao(
+            self,
+            shi_func=list,
+            shu_func=None,
+            fa_func: typing.Union[list, iter, typing.Callable, None] = list,  *args: typing.Any, **kwargs: typing.Any):
+        # 万物之道
+        return self.__class__(shi_func, shu_func, fa_func, self.zhi().wan_wu)
 
     def __call__(self, *args: typing.Any, **kwargs: typing.Any) -> typing.Any:
-        return self.zhi(*args, **kwargs)
+        return self.zhi(*args, **kwargs).wan_wu
 
     def qi_func(self, *args, **kwargs):
         """
@@ -150,7 +161,7 @@ class Dao(object):
         logger_info('[{:.1f}s] 生产 [{}()] {} {}'.format(
             time.time() - start_time, self.shi_func.__name__,
             ('新参数', args, kwargs, '固定参数', self.args, self.kwargs), repr(self.san)[:50]))
-        return self.wan_wu
+        return self
 
     @classmethod
     def for_do_iter(cls, func, its, log_size=1, log_re=1000, timeout=0, filter_res_func=None):

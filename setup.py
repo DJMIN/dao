@@ -4,7 +4,7 @@
 from setuptools import setup, find_packages
 from version import __VERSION__
 setup(
-    name='dao',
+    name='dao0',
     version=__VERSION__,
     description=(
         'dao sheng wan wu'
@@ -19,7 +19,7 @@ setup(
     packages=find_packages(),
     platforms=["all"],
     url='https://github.com/DJMIN/dao',
-    python_requires='>=3.9',
+    python_requires='>=3.5',
     install_requires=[
        "requests",
        "wrapt",
