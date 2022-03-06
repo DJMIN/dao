@@ -75,12 +75,12 @@ class Dao(object):
     道生一(志),一生二(法、术),二生三（器）,三生（势）万物
     # 道生一(志),一生二(势、法),二生三（术）,三生万物???
 
-    志：产生类要达到的目的
-    势： 函数生产者
-    法： 函数如何调度消费者的方法，汇聚结果
-    术： 消费者具体实现处理逻辑
-    器： 消费者载体（进程、线程、函数、属性等）
-    万物： 每个消费者产生的函数结果
+    志：产生类要达到的目的 ~= run
+    势： 函数生产者 ~=
+    法： 函数如何调度消费者的方法，汇聚结果 ~= map and reduce
+    术： 消费者具体实现处理逻辑 ~= map handle func
+    器： 消费者载体（进程、线程、函数、属性等） ~= threading.Thread
+    万物： 每个消费者产生的函数结果  ~= return
 
     道：就是核心思想、理念、本质规律。很多时候有人纠结是自然规律，还是人定的思想，其实王阳明早说了“天理即人心”，我说“天理因人而存在”。这六个字，完全是因为人类存在而存在的，包括外星人。
     法：就是法律、规章、制度、方法。是以“道”为基础制定的不可违背的原则，比如有些经常挂在嘴边却不知所云的“大道自然”或者“以人为本”。
@@ -97,6 +97,8 @@ class Dao(object):
             self, shi_func=None,
             shu_func=None,
             fa_func: typing.Union[list, iter, typing.Callable, None] = list,
+            tian_dao: typing.Union[int, None] = 0,
+            name='0',
             *args, **kwargs
     ):
         """
@@ -107,10 +109,12 @@ class Dao(object):
         :param args:
         :param kwargs:
         """
+
         self.args = args
         self.kwargs = kwargs
         self.san = None
         self.wan_wu = None
+        self.name = name
         self.wan_wu_num_all = 0
         self.wan_wu_num_err = 0
         if shi_func:
@@ -118,8 +122,28 @@ class Dao(object):
         if shu_func:
             self.shu_func = shu_func
         self.fa_func = fa_func  # for循环 map
+        self.tian_dao = tian_dao
         self.wd = self.wu_dao
         self.WD = self.wu_dao
+
+    def __str__(self) -> str:
+        return f"Dao: {self.name}"
+
+    def __repr__(self) -> str:
+        return f"Dao: {self.name}"
+
+    def __call__(self, *args: typing.Any, **kwargs: typing.Any) -> typing.Any:
+        tian_dao_list = []
+        now_dao = self
+        while isinstance(tian_dao := now_dao.tian_dao, self.__class__):
+            tian_dao_list.append(now_dao)
+            now_dao = tian_dao
+
+        wan_wu = now_dao.zhi(*args, **kwargs).wan_wu
+        tian_dao_list.reverse()
+        for dao in tian_dao_list:
+            wan_wu = dao.zhi(wan_wu).wan_wu
+        return wan_wu
 
     def wu_dao(
             self,
@@ -127,10 +151,7 @@ class Dao(object):
             shu_func=None,
             fa_func: typing.Union[list, iter, typing.Callable, None] = list, *args: typing.Any, **kwargs: typing.Any):
         # 万物之道
-        return self.__class__(shi_func, shu_func, fa_func, self.zhi(*args, **kwargs).wan_wu)
-
-    def __call__(self, *args: typing.Any, **kwargs: typing.Any) -> typing.Any:
-        return self.zhi(*args, **kwargs).wan_wu
+        return self.__class__(shi_func, shu_func, fa_func, self, self.name+'->WDao')
 
     def qi_func(self, *args, **kwargs):
         """
@@ -152,6 +173,12 @@ class Dao(object):
         return dao
 
     def zhi(self, *args, **kwargs):
+        """
+        万 法 归一
+        :param args:
+        :param kwargs:
+        :return:
+        """
         start_time = time.time()
         logger_info('[开始] 生产 [{}()] {}'.format(
             self.shi_func.__name__, ('新参数', args, kwargs, '固定参数', self.args, self.kwargs)))
