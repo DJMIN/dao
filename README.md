@@ -46,8 +46,11 @@ if __name__ == '__main__':
     res = D(range, handle)(1, 10)
     print(res)
 
-
-    res = D(range, handle).zhi(1, 10).wd(list, handle).wu_dao(list, handle)()
+    
+    res = D(
+        range, handle).WD(
+        list, handle).WD(
+        list, handle).WD(
+        list, handle)(1, 10)
     print(res)
-
 ```
