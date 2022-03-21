@@ -19,7 +19,6 @@ logger_error = logger.error
 TMP_PATH_CACHE = 'tmp_cache'
 
 
-
 def save_cache_to_file(if_read_cache_key=None):
     """加上装饰器就会保存函数结果到文件，装饰器设置if_read_cache_key字符床，函数定义时设置对应名称参数，并在调用时设置True可从文件读cache"""
     if if_read_cache_key and not os.path.exists(TMP_PATH_CACHE):
@@ -154,7 +153,8 @@ class Dao(object):
     def zhi(self, *args, **kwargs):
         start_time = time.time()
         logger_info('[开始] 生产 [{}()] {}'.format(
-            self.shi_func.__name__, ('新参数', args, kwargs, '固定参数', self.args, self.kwargs)))
+            self.shi_func.__name__ if hasattr(self.shi_func, '__name__') else self.shi_func,
+            ('新参数', args, kwargs, '固定参数', self.args, self.kwargs)))
         if args or kwargs:
             self.args, self.kwargs = args, kwargs
         self.san = self.shi_func(*self.args, **self.kwargs)
@@ -168,23 +168,25 @@ class Dao(object):
         else:
             raise NotImplemented
         logger_info('[{:.1f}s] 生产 [{}()] {} {}'.format(
-            time.time() - start_time, self.shi_func.__name__,
+            time.time() - start_time,
+            self.shi_func.__name__ if hasattr(self.shi_func, '__name__') else self.shi_func,
             ('新参数', args, kwargs, '固定参数', self.args, self.kwargs), repr(self.san)[:50]))
         return self
 
     @classmethod
     def for_do_iter(cls, func, its, log_size=1, log_re=1000, timeout=0, filter_res_func=None):
+        func_name = func.__name__ if hasattr(func, '__name__') else repr(func),
         start_time = time.time()
         all_num = 0
         filter_res_num = 0
 
-        logger_info('[开始] 消费 [{}()] {}'.format(func.__name__, its.__class__))
+        logger_info('[开始] 消费 [{}()] {}'.format(func_name, its.__class__))
         for index, it in enumerate(cls.show_process(its)):
             res = func(it)
             time_use = time.time() - start_time
             if index < log_size or (not index % log_re):
                 logger_info('[{:.1f}s] 消费 第 [{:08d}] 次执行 [{}({})] 将返回 {}'.format(
-                    time_use, index + 1, func.__name__, repr(it), repr(res)[:50]))
+                    time_use, index + 1, func_name, repr(it), repr(res)[:50]))
             if filter_res_func and filter_res_func(res):
                 filter_res_num += 1
             else:
@@ -194,21 +196,22 @@ class Dao(object):
                 break
 
         logger_info('[{:.1f}s] 消费 一共执行 [{}()] [{:08d}] 次,其中 [{:08d}] 次结果被过滤'.format(
-            time.time() - start_time, func.__name__, all_num, filter_res_num))
+            time.time() - start_time, func_name, all_num, filter_res_num))
 
     @classmethod
     def for_do_list(cls, func, its, log_size=1, log_re=1000, timeout=0, filter_res_func=None):
+        func_name = func.__name__ if hasattr(func, '__name__') else repr(func),
         start_time = time.time()
         results = []
         all_num = 0
         filter_res_num = 0
-        logger_info('[开始] 消费 [{}()] {}'.format(func.__name__, its.__class__))
+        logger_info('[开始] 消费 [{}()] {}'.format(func_name, its.__class__))
         for index, it in enumerate(cls.show_process(its)):
             res = func(it)
             time_use = time.time() - start_time
             if index < log_size or (not index % log_re):
                 logger_info('[{:.1f}s] 消费 第 [{:08d}] 次执行 [{}({})] 将返回 {}'.format(
-                    time_use, index + 1, func.__name__, repr(it), repr(res)[:50]))
+                    time_use, index + 1, func_name, repr(it), repr(res)[:50]))
             if filter_res_func and filter_res_func(res):
                 filter_res_num += 1
             else:
@@ -218,7 +221,7 @@ class Dao(object):
                 break
 
         logger_info('[{:.1f}s] 消费 一共执行 [{}()] [{:08d}] 次,其中 [{:08d}] 次结果被过滤'.format(
-            time.time() - start_time, func.__name__, all_num, filter_res_num))
+            time.time() - start_time, func_name, all_num, filter_res_num))
         return results
 
 

@@ -9,7 +9,7 @@ setup(
     description=(
         'dao sheng wan wu'
     ),
-    long_description=open('README.md').read(),
+    long_description=open('README.md', encoding='utf-8').read(),
     long_description_content_type="text/markdown",
     author='readerror',
     author_email='readerror@sina.com',
